@@ -3,9 +3,9 @@ import logging
 
 from sqlalchemy import exc
 
-from app.database.db import db
-from app.database.models import Card, Game, Player
 from config import Config
+from monopoly.database.db import db
+from monopoly.database.models import Card, Game, Player
 
 logger = logging.getLogger(__name__)
 

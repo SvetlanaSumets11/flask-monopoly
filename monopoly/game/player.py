@@ -1,6 +1,6 @@
-from app.database.dao import GameDAO, PlayerDAO
-from app.database.models import Card, Player
 from config import Config
+from monopoly.database.dao import GameDAO, PlayerDAO
+from monopoly.database.models import Card, Player
 
 
 def move_player(player: Player, number_on_dice: int):

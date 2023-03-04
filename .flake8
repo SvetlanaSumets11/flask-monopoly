@@ -3,4 +3,4 @@ max-line-length = 120
 
 exclude = env, venv, migrations, models.py
 import-order-style = google
-application_import_names = app, tests, config
+application_import_names = app, tests, config, monopoly

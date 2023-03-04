@@ -1,4 +1,4 @@
-from app.database.db import db
+from monopoly.database.db import db
 from sqlalchemy.orm import relationship
 
 
