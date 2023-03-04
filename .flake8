@@ -1,6 +1,6 @@
 [flake8]
 max-line-length = 120
 
-exclude = env, venv, migrations, models.py
+exclude = env, venv, migrations
 import-order-style = google
-application_import_names = app, tests, config
+application_import_names = tests, config, monopoly

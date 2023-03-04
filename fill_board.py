@@ -1,4 +1,5 @@
-from app.database.dao import CardDAO
+from monopoly.app import app
+from monopoly.database.dao import CardDAO
 
 
 def initialize_board():
@@ -38,3 +39,8 @@ def initialize_board():
     CardDAO.get_or_create(id=34, title='Park Place', color='Blue', cost=350, rental_price=500)
     CardDAO.get_or_create(id=35, title='Luxury Tax')
     CardDAO.get_or_create(id=36, title='Boardwalk', cost=400, rental_price=600)
+
+
+if __name__ == "__main__":
+    with app.app_context():
+        initialize_board()

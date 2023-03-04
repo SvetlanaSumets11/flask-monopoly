@@ -1,20 +1,20 @@
 from random import randint
 
-from app.database.dao import CardDAO, GameDAO, PlayerDAO
-from app.database.models import Card, Player
-from app.game.card import buy_card
-from app.game.player import charge_rent, make_payments, move_player, move_to_prison
 from config import Config
+from monopoly.database.dao import CardDAO, GameDAO, PlayerDAO
+from monopoly.database.models import Card, Player
+from monopoly.game.card import buy_card
+from monopoly.game.player import charge_rent, make_payments, move_player, move_to_prison
 
 
 def _roll_the_dice() -> int:
     return randint(Config.MIN_DICE_VALUE, Config.MAX_DICE_VALUE)
 
 
-def _on_roll_dice() -> tuple[int, bool]:
+def _on_roll_dice() -> tuple[int, int, bool]:
     first_roll = _roll_the_dice()
     second_roll = _roll_the_dice()
-    return first_roll + second_roll, first_roll == second_roll
+    return first_roll, second_roll, first_roll == second_roll
 
 
 def _process_cards_without_cost(player: Player, card: Card) -> str:
@@ -71,7 +71,7 @@ def _check_position(game_id: str, player: Player) -> str:
 
 def _try_to_get_free(player: Player) -> bool:
     for _ in range(Config.ATTEMPT_TO_GET_FREE):
-        points, is_double = _on_roll_dice()
+        _, _, is_double = _on_roll_dice()
         if is_double is True:
             return True
 
@@ -79,14 +79,13 @@ def _try_to_get_free(player: Player) -> bool:
     return was_paid
 
 
-def make_move(game_id: str, player_id: str) -> str:
+def make_move(game_id: str, player_id: str) -> tuple[int | None, int | None, str]:
     player = PlayerDAO.get_or_create(id=player_id)
     if player.position == Config.PRISON_POSITION:
-        if _try_to_get_free(player) is True:
-            return f'Player {player.id} come out of prison'
-        return f'Player {player.id} failed to become free'
+        if _try_to_get_free(player) is False:
+            return None, None, f'Player {player.id} could not be released from jail'
 
-    points, _ = _on_roll_dice()
-    move_player(player, points)
+    first_point, second_point, _ = _on_roll_dice()
+    move_player(player, first_point + second_point)
     move_result_msg = _check_position(game_id, player)
-    return f'Player {player_id} got {points} points. {move_result_msg}'
+    return first_point, second_point, f'Player {player_id} got {first_point + second_point} points. {move_result_msg}'

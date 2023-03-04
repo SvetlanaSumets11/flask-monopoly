@@ -1,7 +1,7 @@
-from app.database.dao import GameDAO, PlayerDAO
-from app.database.models import Card, Player
-from app.game.player import make_payments
 from config import Config
+from monopoly.database.dao import GameDAO, PlayerDAO
+from monopoly.database.models import Card, Player
+from monopoly.game.player import make_payments
 
 
 def buy_card(game_id: str, card: Card, player: Player) -> bool:
