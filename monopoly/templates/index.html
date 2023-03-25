@@ -1,0 +1,107 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.4/socket.io.js" integrity="sha512-aMGMvNYu8Ue4G+fHa359jcPb1u+ytAF+P2SCb+PxrjCdO3n3ZTxJ30zuH39rimUggmTwmh2u7wvQsDTHESnmfQ==" crossorigin="anonymous"></script>
+    <script type="text/javascript" charset="utf-8">
+        $(document).ready(function() {
+            var socket = io();
+            socket.on('connect', function() {
+                socket.emit('publish_my_event', {data: 'I\'m connected'});
+            });
+
+            socket.on('response', function(msg, cb) {
+                var message = 'Event: ' + msg.event + '; User: ' + msg.user + '; Data: ' + msg.message
+                if (msg.first_point && msg.second_point)
+                    message = message + '; Points: ' + msg.first_point + ':' + msg.second_point
+                $('#log').append('<br>' + $('<div/>').text(message).html());
+                if (cb)
+                    cb();
+            });
+
+            $('form#emit').submit(function(event) {
+                socket.emit('publish_my_event', {data: $('#emit_data').val()});
+                return false;
+            });
+            $('form#broadcast').submit(function(event) {
+                socket.emit('publish_broadcast_event', {data: $('#broadcast_data').val()});
+                return false;
+            });
+            $('form#join').submit(function(event) {
+                socket.emit('join', {room: $('#join_room').val()});
+                document.getElementById('join').style.display = 'none';
+                document.getElementById('join_text').style.display = 'none';
+                document.getElementById('send_room').style.display = 'block';
+                document.getElementById('send_room_text').style.display = 'block';
+                document.getElementById('start').style.display = 'block';
+                document.getElementById('start_text').style.display = 'block';
+                document.getElementById('leave').style.display = 'block';
+                document.getElementById('leave_text').style.display = 'block';
+                return false;
+            });
+            $('form#leave').submit(function(event) {
+                socket.emit('leave');
+                document.getElementById('join').style.display = 'block';
+                document.getElementById('join_text').style.display = 'block';
+                document.getElementById('send_room').style.display = 'none';
+                document.getElementById('send_room_text').style.display = 'none';
+                document.getElementById('start').style.display = 'none';
+                document.getElementById('start_text').style.display = 'none';
+                document.getElementById('leave').style.display = 'none';
+                document.getElementById('leave_text').style.display = 'none';
+                return false;
+            });
+            $('form#send_room').submit(function(event) {
+                socket.emit('publish_room_event', {data: $('#room_data').val()});
+                return false;
+            });
+            $('form#start').submit(function(event) {
+                socket.emit('start');
+                return false;
+            });
+            $('form#disconnect').submit(function(event) {
+                socket.emit('make_disconnect_request');
+                return false;
+            });
+        });
+    </script>
+</head>
+<body>
+    <h1>Monopoly</h1>
+    <h3>My notes:</h3>
+    <form id="emit" method="POST" action='#'>
+        <input type="text" name="emit_data" id="emit_data" placeholder="Message">
+        <input type="submit" value="Send">
+    </form>
+    <h3>Messages for everyone:</h3>
+    <form id="broadcast" method="POST" action='#'>
+        <input type="text" name="broadcast_data" id="broadcast_data" placeholder="Message">
+        <input type="submit" value="Send">
+    </form>
+    <br>
+    <h3 id="join_text">Join the room:</h3>
+    <form id="join" method="POST" action='#'>
+        <input type="text" name="join_room" id="join_room" placeholder="Room Name">
+        <input type="submit" value="Join Room">
+    </form>
+    <h3 id="send_room_text" style="display:none;">Message to room members:</h3>
+    <form id="send_room" style="display:none;" method="POST" action='#'>
+        <input type="text" name="room_data" id="room_data" placeholder="Message">
+        <input type="submit" value="Send to Room">
+    </form>
+    <h3 id="start_text" style="display:none;">Make move:</h3>
+    <form id="start" style="display:none;" method="POST" action='#'>
+        <input type="submit" value="Start">
+    </form>
+    <h3 id="leave_text" style="display:none;">Leave the room:</h3>
+    <form id="leave" style="display:none;" method="POST" action='#'>
+        <input type="submit" value="Leave Room">
+    </form>
+    <h3>Exit the application:</h3>
+    <form id="disconnect" method="POST" action="#">
+        <input type="submit" value="Disconnect">
+    </form>
+    <h2>Receive:</h2>
+    <div id="log"></div>
+</body>
+</html>
